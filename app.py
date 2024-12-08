@@ -1,39 +1,29 @@
 import streamlit as st
 import os
-from dotenv import load_dotenv
 from rag_utils import RAGPDFProcessor
 
 def main():
     st.title("📄 PDF RAG Interaction App")
     
-    # Load environment variables
-    load_dotenv()
-    
-    # Sidebar for PDF upload and API Key
+    # Sidebar for PDF upload
     with st.sidebar:
-        st.header("Configuration")
+        st.header("PDF Upload")
         uploaded_file = st.file_uploader(
             "Upload PDF", 
             type=['pdf'], 
             help="Upload a PDF containing images and tables"
         )
-        openai_api_key = st.text_input(
-            "OpenAI API Key", 
-            type="password",
-            help="Enter your OpenAI API Key"
-        )
 
     # Main interaction area
-    if uploaded_file and openai_api_key:
-        # Save uploaded PDF temporarily
-        with open("temp_uploaded.pdf", "wb") as f:
-            f.write(uploaded_file.getvalue())
-        
+    if uploaded_file:
         try:
-            # Initialize RAG Processor
+            # Save uploaded PDF temporarily
+            with open("temp_uploaded.pdf", "wb") as f:
+                f.write(uploaded_file.getvalue())
+            
+            # Initialize RAG Processor (now using Streamlit secrets)
             rag_processor = RAGPDFProcessor(
-                pdf_path="temp_uploaded.pdf", 
-                openai_api_key=openai_api_key
+                pdf_path="temp_uploaded.pdf"
             )
             
             # Query input
@@ -53,7 +43,7 @@ def main():
             if os.path.exists("temp_uploaded.pdf"):
                 os.remove("temp_uploaded.pdf")
     else:
-        st.warning("Please upload a PDF and provide your OpenAI API Key")
+        st.warning("Please upload a PDF")
 
 if __name__ == "__main__":
     main()
