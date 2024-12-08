@@ -1,4 +1,5 @@
 import os
+import streamlit as st
 from typing import List
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyPDFLoader
@@ -7,8 +8,11 @@ from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain.chains import RetrievalQA
 
 class RAGPDFProcessor:
-    def __init__(self, pdf_path: str, openai_api_key: str):
-        os.environ["OPENAI_API_KEY"] = openai_api_key
+    def __init__(self, pdf_path: str):
+        # Use Streamlit secrets to get API key
+        self.openai_api_key = st.secrets["OPENAI_API_KEY"]
+        os.environ["OPENAI_API_KEY"] = self.openai_api_key
+        
         self.pdf_path = pdf_path
         self.embeddings = OpenAIEmbeddings()
         self.vectorstore = self._process_pdf()
